@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies</title>
+    <style>
+        body{
+            background-color: cadetblue;
+        }
+        #search-container{
+            width: 800px;
+            border: 5px solid black;
+            margin: auto;
+            text-align: center;
+            padding-bottom: 20px
+        }
+        #search{
+            height: 25px;
+            width: 300px;
+        }
+        #search-btn{
+            width: 80px;
+            height: 30px;
+            background-color: bisque;
+        }
+        .heading{
+            font-size: 40px;
+        }
+        #Result{
+            width: 800px;
+            padding: 0 50px;
+            margin: 50px auto;
+            display: flex;
+            gap: 100px;
+        }
+        .recommended{
+            width: 97px;
+            color: darkred;
+            margin-top: -15px;
+            border: 1px solid darkred;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="search-container">
+        <h1 class="heading">Search Movies</h1>
+        <input type="text" placeholder="Enter Movie Name" id="search">
+        <button id="search-btn">Search</button>
+    </div>
+    <div id="Result">
+
+    </div>
+    <script>
+        window.addEventListener('load', function(){
+            var btn= document.getElementById('search-btn')
+            btn.addEventListener('click',handleSearch)
+        })
+        async function handleSearch(){
+            const value= document.getElementById('search').value
+            if(!value){
+                alert("Please Enter Movie Name")
+            }
+            var res= await fetchMovies(value)
+            console.log(res.Response)
+            if(!res.Error){
+                showMovie(res)
+            }
+            else{
+                window.location.replace('./error.html')
+            }
+            document.getElementById('search').value=''
+        }
+        function fetchMovies(input){
+            return fetch(`http://www.omdbapi.com/?apikey=f3747f06&t=${input}`)
+            .then(function(res){
+                return res.json()
+            })
+        }
+        function showMovie(movie){
+            const cont= document.getElementById('Result')
+            cont.textContent= null
+            const div1= document.createElement('div')
+            const image= document.createElement('img')
+            image.src= movie.Poster
+            image.style.width= '350px'
+            image.style.height='450px'
+            div1.append(image)
+            const div2= document.createElement('div')
+            const Title= document.createElement('h1')
+            Title.textContent= `Title: ${movie.Title}`
+            const rated = document.createElement('h3');
+            rated.innerHTML = `Rated: ${movie.Rated}`;
+            const release = document.createElement('h3');
+            release.innerHTML = `Release Date: ${movie.Released}`;
+            const genre = document.createElement('h3');
+            genre.innerHTML = `Genre: ${movie.Genre}`;
+            const rating = document.createElement('h3');
+            rating.innerHTML = `Imdb Rating: ${movie.imdbRating}`;
+            const actors= document.createElement('h3')
+            actors.textContent= `Actors: ${movie.Actors}`
+            const lang = document.createElement('h3');
+            lang.innerHTML = `Language: ${movie.Language}`;
+            const director = document.createElement('h3');
+            director.innerHTML = `Director: ${movie.Director}`;
+            const rec= document.createElement('p')
+            rec.textContent='Recommended'
+            rec.setAttribute('class','recommended')
+            if(Number(movie.imdbRating)>8.5){
+                div2.append(Title,rec,rated,release,genre,rating,actors,director,lang)
+            }
+            else{
+                div2.append(Title,rated,release,genre,rating,actors,director,lang)
+            }
+            cont.append(div1,div2)
+        }
+    </script>
+</body>
+</html>
